@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trigonometry Memory Card Game</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100%;
+      overflow: auto;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .container {
+      min-height: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      width: 100%;
+    }
+
+    .header h1 {
+      margin: 0 0 10px 0;
+      font-size: 32px;
+    }
+
+    /* Setup Screen */
+    .setup-screen {
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .materi-section {
+      margin-bottom: 30px;
+    }
+
+    .materi-images {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .materi-img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
+
+    .materi-img:hover {
+      transform: scale(1.02);
+    }
+
+    .setup-title {
+      font-size: 24px;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .selection-group {
+      margin-bottom: 30px;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .selection-group h3 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .checkbox-item:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .checkbox-item label {
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+    }
+
+    .error-message {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+
+    .start-button {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .start-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Game Screen */
+    .game-screen {
+      display: none;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .game-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 25px;
+      padding: 15px;
+      border-radius: 10px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    @media (max-width: 600px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+    }
+
+    .card {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 3px solid transparent;
+      padding: 10px;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    .card:hover:not(.matched) {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .card.flipped {
+      font-size: 18px;
+    }
+
+    .card.matched {
+      cursor: default;
+      opacity: 0.7;
+    }
+
+    .back-button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .back-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .victory-message {
+      display: none;
+      text-align: center;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .victory-message h2 {
+      margin: 0 0 15px 0;
+      font-size: 28px;
+    }
+
+    .victory-message p {
+      margin: 5px 0;
+      font-size: 18px;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container">
+   <div class="header">
+    <h1 id="game-title">🧮 Trigonometry Memory Game</h1>
+   </div><!-- Setup Screen -->
+   <div class="setup-screen" id="setupScreen"><!-- Materi Images -->
+    <div class="materi-section">
+     <h2 style="text-align: center; margin-bottom: 20px; font-size: 24px;">📚 Materi Trigonometri</h2>
+     <div class="materi-images"><img src="https://raw.githubusercontent.com/mathnology/PERBANDINGAN-SUDUT-TRIGONOMETRI/refs/heads/main/MATERI%201.jpeg" alt="Materi Trigonometri 1" class="materi-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="img-error" style="display: none; padding: 20px; background: #fed7d7; border-radius: 8px; text-align: center; color: #c53030;">
+       Gambar tidak dapat dimuat
+      </div><img src="https://raw.githubusercontent.com/mathnology/PERBANDINGAN-SUDUT-TRIGONOMETRI/refs/heads/main/MATERI%202.jpeg" alt="Materi Trigonometri 2" class="materi-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="img-error" style="display: none; padding: 20px; background: #fed7d7; border-radius: 8px; text-align: center; color: #c53030;">
+       Gambar tidak dapat dimuat
+      </div><img src="https://raw.githubusercontent.com/mathnology/PERBANDINGAN-SUDUT-TRIGONOMETRI/refs/heads/main/JARI%20SUDUT.gif" alt="Jari Sudut Trigonometri" class="materi-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="img-error" style="display: none; padding: 20px; background: #fed7d7; border-radius: 8px; text-align: center; color: #c53030;">
+       Gambar tidak dapat dimuat
+      </div><img src="https://raw.githubusercontent.com/mathnology/PERBANDINGAN-SUDUT-TRIGONOMETRI/refs/heads/main/MATERI%203.jpeg" alt="Materi Trigonometri 3" class="materi-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="img-error" style="display: none; padding: 20px; background: #fed7d7; border-radius: 8px; text-align: center; color: #c53030;">
+       Gambar tidak dapat dimuat
+      </div><img src="https://raw.githubusercontent.com/mathnology/PERBANDINGAN-SUDUT-TRIGONOMETRI/refs/heads/main/COS%20135.gif" alt="Contoh Cos 135" class="materi-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="img-error" style="display: none; padding: 20px; background: #fed7d7; border-radius: 8px; text-align: center; color: #c53030;">
+       Gambar tidak dapat dimuat
+      </div><img src="https://raw.githubusercontent.com/mathnology/PERBANDINGAN-SUDUT-TRIGONOMETRI/refs/heads/main/TAN%20240.gif" alt="Contoh Tan 240" class="materi-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="img-error" style="display: none; padding: 20px; background: #fed7d7; border-radius: 8px; text-align: center; color: #c53030;">
+       Gambar tidak dapat dimuat
+      </div>
+     </div>
+    </div>
+    <h2 class="setup-title" id="setup-title">Pilih Tantangan Anda</h2>
+    <div class="error-message" id="errorMessage"></div>
+    <div class="selection-group" id="functionGroup">
+     <h3>Pilih Fungsi Trigonometri (minimal 1):</h3>
+     <div class="checkbox-grid">
+      <div class="checkbox-item"><input type="checkbox" id="sin" value="sin" checked> <label for="sin">sin</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="cos" value="cos" checked> <label for="cos">cos</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="tan" value="tan" checked> <label for="tan">tan</label>
+      </div>
+     </div>
+    </div>
+    <div class="selection-group" id="angleGroup">
+     <h3>Pilih Sudut Istimewa (minimal 4):</h3>
+     <div class="checkbox-grid">
+      <div class="checkbox-item"><input type="checkbox" id="angle0" value="0" checked> <label for="angle0">0°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle30" value="30" checked> <label for="angle30">30°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle45" value="45" checked> <label for="angle45">45°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle60" value="60" checked> <label for="angle60">60°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle90" value="90"> <label for="angle90">90°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle120" value="120"> <label for="angle120">120°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle135" value="135"> <label for="angle135">135°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle150" value="150"> <label for="angle150">150°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle180" value="180"> <label for="angle180">180°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle210" value="210"> <label for="angle210">210°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle225" value="225"> <label for="angle225">225°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle240" value="240"> <label for="angle240">240°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle270" value="270"> <label for="angle270">270°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle300" value="300"> <label for="angle300">300°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle315" value="315"> <label for="angle315">315°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle330" value="330"> <label for="angle330">330°</label>
+      </div>
+      <div class="checkbox-item"><input type="checkbox" id="angle360" value="360"> <label for="angle360">360°</label>
+      </div>
+     </div>
+    </div><button class="start-button" id="startButton">Mulai Permainan</button>
+   </div><!-- Game Screen -->
+   <div class="game-screen" id="gameScreen">
+    <div class="victory-message" id="victoryMessage">
+     <h2>🎉 Selamat! 🎉</h2>
+     <p>Anda berhasil mencocokkan semua kartu!</p>
+     <p><strong>Total Langkah: <span id="finalMoves">0</span></strong></p>
+    </div>
+    <div class="game-stats" id="gameStats">
+     <div class="stat-item">
+      <div class="stat-label">
+       Langkah
+      </div>
+      <div class="stat-value" id="movesCount">
+       0
+      </div>
+     </div>
+     <div class="stat-item">
+      <div class="stat-label">
+       Pasangan Cocok
+      </div>
+      <div class="stat-value" id="matchesCount">
+       0 / 8
+      </div>
+     </div>
+    </div>
+    <div class="cards-grid" id="cardsGrid"></div><button class="back-button" id="backButton">Kembali ke Setup</button>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "🧮 Trigonometry Memory Game",
+      setup_title: "Pilih Tantangan Anda",
+      start_button_text: "Mulai Permainan",
+      new_game_text: "Permainan Baru",
+      back_button_text: "Kembali ke Setup",
+      background_color: "#f0f4f8",
+      surface_color: "#ffffff",
+      text_color: "#2d3748",
+      primary_color: "#4299e1",
+      accent_color: "#48bb78",
+      font_family: "Segoe UI",
+      font_size: 16
+    };
+
+    const trigValues = {
+      sin: {
+        0: "0", 30: "½", 45: "½√2", 60: "½√3", 90: "1",
+        120: "½√3", 135: "½√2", 150: "½", 180: "0",
+        210: "-½", 225: "-½√2", 240: "-½√3", 270: "-1",
+        300: "-½√3", 315: "-½√2", 330: "-½", 360: "0"
+      },
+      cos: {
+        0: "1", 30: "½√3", 45: "½√2", 60: "½", 90: "0",
+        120: "-½", 135: "-½√2", 150: "-½√3", 180: "-1",
+        210: "-½√3", 225: "-½√2", 240: "-½", 270: "0",
+        300: "½", 315: "½√2", 330: "½√3", 360: "1"
+      },
+      tan: {
+        0: "0", 30: "⅓√3", 45: "1", 60: "√3", 90: "∞",
+        120: "-√3", 135: "-1", 150: "-⅓√3", 180: "0",
+        210: "⅓√3", 225: "1", 240: "√3", 270: "∞",
+        300: "-√3", 315: "-1", 330: "-⅓√3", 360: "0"
+      }
+    };
+
+    let gameState = {
+      cards: [],
+      flippedCards: [],
+      matchedPairs: 0,
+      moves: 0,
+      canFlip: true
+    };
+
+    async function onConfigChange(config) {
+      const baseFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+      const fontSize = config.font_size || defaultConfig.font_size;
+
+      document.body.style.fontFamily = `${baseFont}, ${baseFontStack}`;
+      document.body.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      document.body.style.color = config.text_color || defaultConfig.text_color;
+
+      document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('game-title').style.fontSize = `${fontSize * 2}px`;
+      document.getElementById('game-title').style.color = config.text_color || defaultConfig.text_color;
+
+      document.getElementById('setup-title').textContent = config.setup_title || defaultConfig.setup_title;
+      document.getElementById('setup-title').style.fontSize = `${fontSize * 1.5}px`;
+      document.getElementById('setup-title').style.color = config.text_color || defaultConfig.text_color;
+
+      document.getElementById('startButton').textContent = config.start_button_text || defaultConfig.start_button_text;
+      document.getElementById('startButton').style.backgroundColor = config.primary_color || defaultConfig.primary_color;
+      document.getElementById('startButton').style.color = config.surface_color || defaultConfig.surface_color;
+      document.getElementById('startButton').style.fontSize = `${fontSize * 1.125}px`;
+
+      document.getElementById('backButton').textContent = config.back_button_text || defaultConfig.back_button_text;
+      document.getElementById('backButton').style.backgroundColor = config.primary_color || defaultConfig.primary_color;
+      document.getElementById('backButton').style.color = config.surface_color || defaultConfig.surface_color;
+      document.getElementById('backButton').style.fontSize = `${fontSize}px`;
+
+      const selectionGroups = document.querySelectorAll('.selection-group');
+      selectionGroups.forEach(group => {
+        group.style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+        group.style.border = `2px solid ${config.primary_color || defaultConfig.primary_color}`;
+      });
+
+      const groupHeaders = document.querySelectorAll('.selection-group h3');
+      groupHeaders.forEach(header => {
+        header.style.color = config.text_color || defaultConfig.text_color;
+        header.style.fontSize = `${fontSize * 1.125}px`;
+      });
+
+      const checkboxLabels = document.querySelectorAll('.checkbox-item label');
+      checkboxLabels.forEach(label => {
+        label.style.color = config.text_color || defaultConfig.text_color;
+        label.style.fontSize = `${fontSize * 0.875}px`;
+      });
+
+      document.getElementById('gameStats').style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+
+      const statLabels = document.querySelectorAll('.stat-label');
+      statLabels.forEach(label => {
+        label.style.color = config.text_color || defaultConfig.text_color;
+        label.style.fontSize = `${fontSize * 0.875}px`;
+      });
+
+      const statValues = document.querySelectorAll('.stat-value');
+      statValues.forEach(value => {
+        value.style.color = config.primary_color || defaultConfig.primary_color;
+        value.style.fontSize = `${fontSize * 1.5}px`;
+      });
+
+      document.getElementById('victoryMessage').style.backgroundColor = config.accent_color || defaultConfig.accent_color;
+      document.getElementById('victoryMessage').style.color = config.surface_color || defaultConfig.surface_color;
+
+      const victoryH2 = document.querySelector('.victory-message h2');
+      if (victoryH2) {
+        victoryH2.style.fontSize = `${fontSize * 1.75}px`;
+      }
+
+      const victoryP = document.querySelectorAll('.victory-message p');
+      victoryP.forEach(p => {
+        p.style.fontSize = `${fontSize * 1.125}px`;
+      });
+
+      updateCardColors();
+    }
+
+    function updateCardColors() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        if (card.classList.contains('matched')) {
+          card.style.backgroundColor = config.accent_color || defaultConfig.accent_color;
+          card.style.color = config.surface_color || defaultConfig.surface_color;
+          card.style.borderColor = config.accent_color || defaultConfig.accent_color;
+        } else if (card.classList.contains('flipped')) {
+          card.style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+          card.style.color = config.text_color || defaultConfig.text_color;
+          card.style.borderColor = config.primary_color || defaultConfig.primary_color;
+        } else {
+          card.style.backgroundColor = config.primary_color || defaultConfig.primary_color;
+          card.style.color = config.surface_color || defaultConfig.surface_color;
+          card.style.borderColor = config.primary_color || defaultConfig.primary_color;
+        }
+      });
+    }
+
+    document.getElementById('startButton').addEventListener('click', startGame);
+    document.getElementById('backButton').addEventListener('click', backToSetup);
+
+    function startGame() {
+      const selectedFunctions = Array.from(document.querySelectorAll('input[type="checkbox"][id^="sin"], input[type="checkbox"][id^="cos"], input[type="checkbox"][id^="tan"]'))
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+
+      const selectedAngles = Array.from(document.querySelectorAll('input[type="checkbox"][id^="angle"]'))
+        .filter(cb => cb.checked)
+        .map(cb => parseInt(cb.value));
+
+      const errorMsg = document.getElementById('errorMessage');
+      
+      if (selectedFunctions.length < 1) {
+        errorMsg.textContent = 'Pilih minimal 1 fungsi trigonometri!';
+        errorMsg.style.display = 'block';
+        errorMsg.style.backgroundColor = '#fed7d7';
+        errorMsg.style.color = '#c53030';
+        return;
+      }
+
+      if (selectedAngles.length < 4) {
+        errorMsg.textContent = 'Pilih minimal 4 sudut istimewa!';
+        errorMsg.style.display = 'block';
+        errorMsg.style.backgroundColor = '#fed7d7';
+        errorMsg.style.color = '#c53030';
+        return;
+      }
+
+      errorMsg.style.display = 'none';
+
+      const pairs = [];
+      for (const func of selectedFunctions) {
+        for (const angle of selectedAngles) {
+          pairs.push({
+            notation: `${func} ${angle}°`,
+            value: trigValues[func][angle],
+            pairId: `${func}-${angle}`
+          });
+        }
+      }
+
+      const selectedPairs = pairs.sort(() => Math.random() - 0.5).slice(0, 8);
+
+      const cards = [];
+      selectedPairs.forEach(pair => {
+        cards.push({ content: pair.notation, pairId: pair.pairId, type: 'notation' });
+        cards.push({ content: pair.value, pairId: pair.pairId, type: 'value' });
+      });
+
+      gameState.cards = cards.sort(() => Math.random() - 0.5);
+      gameState.flippedCards = [];
+      gameState.matchedPairs = 0;
+      gameState.moves = 0;
+      gameState.canFlip = true;
+
+      document.getElementById('movesCount').textContent = '0';
+      document.getElementById('matchesCount').textContent = '0 / 8';
+      document.getElementById('victoryMessage').style.display = 'none';
+
+      renderCards();
+
+      document.getElementById('setupScreen').style.display = 'none';
+      document.getElementById('gameScreen').style.display = 'block';
+    }
+
+    function renderCards() {
+      const grid = document.getElementById('cardsGrid');
+      grid.innerHTML = '';
+
+      gameState.cards.forEach((card, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'card';
+        cardElement.dataset.index = index;
+        cardElement.textContent = '🧠';
+        
+        cardElement.addEventListener('click', () => flipCard(index));
+        grid.appendChild(cardElement);
+      });
+
+      updateCardColors();
+    }
+
+    function flipCard(index) {
+      if (!gameState.canFlip) return;
+      
+      const card = gameState.cards[index];
+      if (card.matched || gameState.flippedCards.some(fc => fc.index === index)) return;
+
+      const cardElement = document.querySelectorAll('.card')[index];
+      cardElement.classList.add('flipped');
+      cardElement.textContent = card.content;
+      updateCardColors();
+
+      gameState.flippedCards.push({ index, card });
+
+      if (gameState.flippedCards.length === 2) {
+        gameState.moves++;
+        document.getElementById('movesCount').textContent = gameState.moves;
+        gameState.canFlip = false;
+
+        setTimeout(checkMatch, 800);
+      }
+    }
+
+    function checkMatch() {
+      const [first, second] = gameState.flippedCards;
+
+      if (first.card.pairId === second.card.pairId) {
+        first.card.matched = true;
+        second.card.matched = true;
+
+        const cardElements = document.querySelectorAll('.card');
+        cardElements[first.index].classList.add('matched');
+        cardElements[second.index].classList.add('matched');
+        
+        updateCardColors();
+
+        gameState.matchedPairs++;
+        document.getElementById('matchesCount').textContent = `${gameState.matchedPairs} / 8`;
+
+        if (gameState.matchedPairs === 8) {
+          setTimeout(showVictory, 500);
+        }
+      } else {
+        const cardElements = document.querySelectorAll('.card');
+        cardElements[first.index].classList.remove('flipped');
+        cardElements[second.index].classList.remove('flipped');
+        cardElements[first.index].textContent = '🧠';
+        cardElements[second.index].textContent = '🧠';
+        updateCardColors();
+      }
+
+      gameState.flippedCards = [];
+      gameState.canFlip = true;
+    }
+
+    function showVictory() {
+      document.getElementById('finalMoves').textContent = gameState.moves;
+      document.getElementById('victoryMessage').style.display = 'block';
+    }
+
+    function backToSetup() {
+      document.getElementById('setupScreen').style.display = 'block';
+      document.getElementById('gameScreen').style.display = 'none';
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_color || defaultConfig.primary_color,
+              set: (value) => {
+                config.primary_color = value;
+                window.elementSdk.setConfig({ primary_color: value });
+              }
+            },
+            {
+              get: () => config.accent_color || defaultConfig.accent_color,
+              set: (value) => {
+                config.accent_color = value;
+                window.elementSdk.setConfig({ accent_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["setup_title", config.setup_title || defaultConfig.setup_title],
+          ["start_button_text", config.start_button_text || defaultConfig.start_button_text],
+          ["new_game_text", config.new_game_text || defaultConfig.new_game_text],
+          ["back_button_text", config.back_button_text || defaultConfig.back_button_text]
+        ])
+      });
+    }
+
+    onConfigChange(defaultConfig);
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a0ad5284531c61e',t:'MTc2MzUwNDE5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
